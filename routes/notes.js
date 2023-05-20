@@ -35,7 +35,7 @@ notes.post('/', (req, res) => {
             console.error(err);
             return;
             } else {
-            parsedData = JSON.parse(data)
+           const parsedData = JSON.parse(data)
 
             parsedData.push(newNote)
         ;
@@ -50,24 +50,32 @@ notes.post('/', (req, res) => {
     }})
 }})
 
-
+//Route to delete a note
 notes.delete('/:id', (req, res) => {
     console.info(`${req.method} method was received`)
 
-    const id = req.params.note_id;
-    readFromFile('./Develop/db/db.json').then((data) => res.json(JSON.parse(data)))
+    const id = req.params.id;
+    fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
+        if (err) {
+        console.error(err);
+        return;
+        } else {
+        const parsedlist = JSON.parse(data)
+        for (i=0; i<parsedlist.length; i++) {
+            if(parsedlist[i].id === id) {
+                parsedlist.splice(i, 1)
+            };
+            console.log(parsedlist[i].note_id)
+        };
+    
+        fs.writeFile('./Develop/db/db.json', JSON.stringify(parsedlist, null, 1), err => {
+            if (err) {
+            console.error(err);
+            } else {
+                console.info('A note has been deleted')
+            }
+        });
+}})
 
-    JSON.parse(data) = notesList
-
-    for (i=0; i<notesList.length; i++) {
-        if (notesList[i].note_id === id) {
-            notesList.splice(i, 1)
-        }
-    } 
-
-    readAndAppend(notesList, './Develop/db/db.json')
-    res.json('The note is deleted')
 })
-
-
 module.exports = notes
