@@ -27,7 +27,7 @@ notes.post('/', (req, res) => {
     const newNote = {
         title,
         text,
-        note_id: uuidv4()
+        id: uuidv4()
   };
 
         fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
@@ -50,32 +50,36 @@ notes.post('/', (req, res) => {
     }})
 }})
 
-//Route to delete a note
+
 notes.delete('/:id', (req, res) => {
-    console.info(`${req.method} method was received`)
+    console.info(`${req.method} method was received`);
 
     const id = req.params.id;
+
     fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
         if (err) {
-        console.error(err);
-        return;
-        } else {
-        const parsedlist = JSON.parse(data)
-        for (i=0; i<parsedlist.length; i++) {
-            if(parsedlist[i].id === id) {
-                parsedlist.splice(i, 1)
-            };
-            console.log(parsedlist[i].note_id)
-        };
-    
-        fs.writeFile('./Develop/db/db.json', JSON.stringify(parsedlist, null, 1), err => {
-            if (err) {
             console.error(err);
-            } else {
-                console.info('A note has been deleted')
+            return;
+        } else {
+            const parsedlist = JSON.parse(data);
+            for (let i = 0; i < parsedlist.length; i++) {
+                if (parsedlist[i].id === id) {
+                    parsedlist.splice(i, 1);
+                    break; // Exit the loop once the note is deleted
+                }
             }
-        });
-}})
+            console.log(id);
 
-})
+            fs.writeFile('./Develop/db/db.json', JSON.stringify(parsedlist, null, 1), err => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.info('A note has been deleted');
+                }
+            });
+        }
+    });
+});
+
+
 module.exports = notes
