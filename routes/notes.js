@@ -2,10 +2,10 @@ const notes = require('express').Router();
 const fs = require('fs');
 const {v4: uuidv4} = require('uuid');
 
-//Route to generate the api notes from the db.json
+//Route to get the notes from the db.json
 notes.get('/', (req, res) => {
     console.info(`${req.method} method was received`)
-    fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
         if (err) {
           console.error(err);
           return;
@@ -15,7 +15,7 @@ notes.get('/', (req, res) => {
     }});
 });
 
-//Route to add a note to the express json 
+//Route to add a note to the db.json 
 notes.post('/', (req, res) => {
   
   console.info(`${req.method} method was received`)
@@ -30,7 +30,7 @@ notes.post('/', (req, res) => {
         id: uuidv4()
   };
 
-        fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
             if (err) {
             console.error(err);
             return;
@@ -40,7 +40,7 @@ notes.post('/', (req, res) => {
             parsedData.push(newNote)
         ;
 
-        fs.writeFile('./Develop/db/db.json', JSON.stringify(parsedData, null, 1), err => {
+        fs.writeFile('./db/db.json', JSON.stringify(parsedData, null, 1), err => {
             if (err) {
             console.error(err);
             } else {
@@ -50,13 +50,13 @@ notes.post('/', (req, res) => {
     }})
 }})
 
-
+//Route to delete a note from db.json
 notes.delete('/:id', (req, res) => {
     console.info(`${req.method} method was received`);
 
     const id = req.params.id;
 
-    fs.readFile('./Develop/db/db.json', 'utf8', (err, data) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
         if (err) {
             console.error(err);
             return;
@@ -65,12 +65,11 @@ notes.delete('/:id', (req, res) => {
             for (let i = 0; i < parsedlist.length; i++) {
                 if (parsedlist[i].id === id) {
                     parsedlist.splice(i, 1);
-                    break; // Exit the loop once the note is deleted
+                    return; 
                 }
             }
-            console.log(id);
 
-            fs.writeFile('./Develop/db/db.json', JSON.stringify(parsedlist, null, 1), err => {
+            fs.writeFile('./db/db.json', JSON.stringify(parsedlist, null, 1), err => {
                 if (err) {
                     console.error(err);
                 } else {
