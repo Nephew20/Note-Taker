@@ -26,7 +26,7 @@ The purpose of this project was to combine the front end fetch request with serv
   - npm install uuid 
 - Lastly, run **npm start** or **node server.js** to run the back end where a link will take you to the website
 
-Click here to be taken to the deployed site : [here](https://mighty-temple-98807.herokuapp.com/)
+Link to the deployed site : [Deployed Site](https://mighty-temple-98807.herokuapp.com/)
 
 ## Contact Info
 
