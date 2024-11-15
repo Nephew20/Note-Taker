@@ -12,7 +12,7 @@ notes.get('/', (req, res) => {
 });
 
 notes.get('/:id', (req, res) => {
-    console.info(`${req.method} method was received`);
+    console.info(`${req.method} single ID method was received`);
 
     // id of the note in the database
     const noteId = req.params.id;
@@ -24,7 +24,7 @@ notes.get('/:id', (req, res) => {
             const jsonData = JSON.parse(data);
             console.log('JSON Data:', jsonData);
 
-            const result = jsonData.find((note) => note.note_id === noteId);
+            const result = jsonData.find((note) => note.id == noteId);
 
             if (result) {
                 res.status(200).json(result)
@@ -32,7 +32,7 @@ notes.get('/:id', (req, res) => {
                 res.status(404).json('No note with this ID!')
             }
 
-            
+
         })
         .catch((err) => {
             console.error(err);
@@ -52,7 +52,7 @@ notes.post('/', (req, res) => {
         const newNote = {
             title,
             text,
-            note_id: uuidv4()
+            id: uuidv4()
         };
 
         readAndAppend(newNote, './db/db.json')
@@ -68,33 +68,27 @@ notes.post('/', (req, res) => {
 notes.delete('/:id', (req, res) => {
     console.info(`${req.method} method was received`);
 
-    const targetID = req.params.id;
+    const noteId = req.params.id;
 
-    if (targetID) {
-        fs.readFile('./db/db.json', 'utf8', (err, data) => {
-            if (err) {
-                console.error(err);
-                return;
-            } else {
+    if (noteId) {
+        readFromFile('./db/db.json')
+            .then((data) => {
                 const parsedlist = JSON.parse(data);
-                for (let i = 0; i < parsedlist.length; i++) {
-                    if (parsedlist[i].note_id === targetID) {
-                        parsedlist.splice(i, 1);
-                        console.log(parsedlist)
-                        return parsedlist;
-                    }
-                }
+                console.log('Parsed List:', parsedlist);
 
-                fs.writeFile('./db/db.json', JSON.stringify(parsedlist, null, 1), err => {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        console.info('A note has been deleted');
-                    }
-                });
-            }
-        });
+                const newList = parsedlist.filter((note) => note.id !== noteId)
 
+                console.log("New List:", newList)
+                writeToFile('./db/db.json', newList)
+                
+                res.status(200).json()
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).json('Error reading the database');
+            })
+    } else {
+        res.status(400).json('No note found!')
     }
 });
 
